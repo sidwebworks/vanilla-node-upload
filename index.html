@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      img {
+        width: 600px;
+        object-fit: cover;
+        margin-top: 1rem;
+        height: 400px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section>
+      <form>
+        <input type="file" name="Image" />
+        <button type="submit">Upload</button>
+      </form>
+      <img src="" alt="Preview" />
+    </section>
+
+    <script type="module">
+      const img = document.querySelector('img');
+      const form = document.querySelector('form');
+      const input = document.querySelector('input[type="file"]');
+
+      const reader = new FileReader();
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const data = new FormData();
+
+        const file = input.files[0];
+
+        try {
+          await fetch('/upload', {
+            method: 'POST',
+            headers: {
+              filename: file.name,
+            },
+            body: file,
+          });
+        } catch (error) {
+          console.log('error: ', error);
+        }
+      });
+
+      input.addEventListener('change', (event) => {
+        reader.readAsArrayBuffer(event.target.files[0]);
+
+        reader.onloadend = async (e) => {
+          const data = e.target.result;
+
+          const blob = new Blob([data]);
+
+          img.src = URL.createObjectURL(blob);
+        };
+      });
+    </script>
+  </body>
+</html>
